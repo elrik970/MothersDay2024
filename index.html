@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Memory Game</title>
+    <style>
+        body {
+            background-color: rgb(33, 33, 33);
+        }
+        .row {
+            display: flex;
+            flex-wrap: wrap;
+            padding: 0 4px;
+
+            position: relative;
+            left: 38vw;
+
+        }
+        .column {
+            flex: 50%;
+            padding: 0 4px;
+        }
+        .column img {
+            margin-right: 1vw;
+            margin-top: 1vw;
+            border: 0.5vw solid rgb(171, 171, 171);
+            border-radius: 1vw;
+            width: 5vw;
+            height: 5vw;
+        }
+        .titleText {
+            color: white;
+            font-size: 4vw;
+            font-family: Impact, Haettenschweiler, 'Arial Narrow Bold', sans-serif;
+            margin-left: 33vw;
+        }
+        img:hover {
+            border-color:rgb(255, 255, 255);
+            transition: all 0.2s;
+        }
+        img {
+            transition: all 0.2s;
+        }
+        a {
+            background-color: transparent;
+        }
+        button {
+            border: none;
+            cursor: pointer;
+            appearance: none;
+            background-color: inherit;
+        }
+    
+    </style>
+    <script>
+        let boxes = new Array("1111","1111","1111");
+        let clickedBoxes = new Array("11111","11111","111111");
+        let curBoxNum = 0;
+        let timeToWait = 1000;
+
+        const delay = ms => new Promise(res => setTimeout(res, ms));
+
+        window.onload = async e => {
+            await disableSquares();
+            await randomSquares();
+            await enableSquares();
+        }
+        async function randomSquares() {
+            
+            let x = Math.floor(Math.random() * 3);
+            let y = Math.floor(Math.random() * 3);
+            boxes[0] = String(x) + String(y);
+            virtualSquareClick(x,y);
+
+            await delay(timeToWait);
+
+            unsquareClick(x,y);
+
+            let id = "";
+
+            while (true) {
+                x = Math.floor(Math.random() * 3);
+                y = Math.floor(Math.random() * 3);
+                id = String(x) + String(y);
+                if (!boxes.includes(id,0)) {
+                    boxes[1] = id;
+                    virtualSquareClick(x,y);
+                    break;
+                }
+            }
+            await delay(timeToWait);
+
+            unsquareClick(x,y);
+
+            while (true) {
+                x = Math.floor(Math.random() * 3);
+                y = Math.floor(Math.random() * 3);
+                id = String(x) + String(y)
+                if (!boxes.includes(id,0)) {
+                    boxes[2] = id
+                    virtualSquareClick(x,y);
+                    break;
+                }
+            }
+            await delay(timeToWait);
+        }
+        async function disableSquares() {
+            for (let i = 0; i < 3; i++) {
+                for (let j = 0; j < 3; j++) {
+                    const id = String(i) + String(j);
+                    const button = document.getElementById(id).onclick = null;
+                    unsquareClick(String(i),String(j));
+                }
+            }
+        } 
+        async function enableSquares() {
+            for (let i = 0; i < 3; i++) {
+                for (let j = 0; j < 3; j++) {
+                    const id = String(i) + String(j);
+                    const button = document.getElementById(id).onclick = function() { squareClick(String(i),String(j)); };
+                    unsquareClick(String(i),String(j));
+                }
+            }
+        }
+        async function squareClick(x,y) {
+            const id = String(x) + String(y);
+            document.getElementById(id).style.border = "0.5vw solid rgb(144, 238, 144)";
+            clickedBoxes[curBoxNum] = id;
+            
+            if (JSON.stringify(clickedBoxes) === JSON.stringify(boxes)) {
+                curBoxNum = 0;
+                if (timeToWait > 10) {
+                    timeToWait -= 75;
+                    if (timeToWait < 10) {
+                        timeToWait = 10;
+                    }
+                }
+                boxes = new Array("111","111","111");
+                clickedBoxes = new Array("000","000","000");
+                await disableSquares();
+                await randomSquares();
+                await enableSquares();
+
+                return;
+            }
+            else {
+                if (boxes[curBoxNum] != id) {
+                    const text = document.getElementById("Title");
+                    text.innerHTML  = "FAIL. I STILL LOVE YOU";
+                    text.style.color = "rgb(240, 70, 70)";
+                }
+                
+            }
+
+            curBoxNum++;
+        }
+        async function virtualSquareClick(x,y) {
+            const id = String(x) + String(y);
+            document.getElementById(id).style.border = "0.5vw solid rgb(210, 43, 43)";
+        }
+        async function unsquareClick(x,y) {
+            const id = String(x) + String(y);
+            document.getElementById(id).style.border = "0.5vw solid rgb(171, 171, 171)";
+        }
+    </script>
+</head>
+<body>
+    <p class = "titleText" id = "Title">HAPPY MOTHERS DAY</p>
+    <div class="row">
+        <div class = "column">
+            <button class = "square" id = "button00">
+                <img src = "images/Square.png" onclick = squareClick(0,0) id = "00">
+            </button>
+            <button href="" class = "square" id = "button01">
+                <img src = "images/Square.png" onclick = squareClick(0,1) id = "01">
+            </button>
+            <button href="" class = "square" id = "button02">
+                <img src = "images/Square.png" onclick = squareClick(0,2) id = "02">
+            </button>
+        </div>
+        <div class = "column">
+            <button href="" class = "square" id = "button10">
+                <img src = "images/Square.png" onclick = squareClick(1,0) id = "10">
+            </button>
+            <button href="" class = "square" id = "button11">
+                <img src = "images/Square.png" onclick = squareClick(1,1) id = "11">
+            </button>
+            <button href="" class = "square" id = "button12">
+                <img src = "images/Square.png" onclick = squareClick(1,2) id = "12">
+            </button>
+        </div>
+        <div class = "column">
+            <button href="" class = "square" id = "button20">
+                <img src = "images/Square.png" onclick = squareClick(2,0) id = "20">
+            </button>
+            <button href="" class = "square" id = "button21">
+                <img src = "images/Square.png" onclick = squareClick(2,1) id = "21">
+            </button>
+            <button href="" class = "square" id = "button22">
+                <img src = "images/Square.png" onclick = squareClick(2,2) id = "22">
+            </button>
+        </div>
+    </div>
+    
+</body>
+</html>
+
